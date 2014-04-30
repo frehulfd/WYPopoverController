@@ -2572,19 +2572,25 @@ static WYPopoverTheme *defaultTheme_ = nil;
     WYPopoverAnimationOptions style = aOptions;
     
     __weak __typeof__(self) weakSelf = self;
-    
+
+    // We need to capture the window before we do the animations, additionally we can't
+    // count on inView still being in the view hierarchy.  It is entirely possible that
+    // the inView could be removed from the view hierarchy by this point, so we use the
+    // backgroundView's window (which was the same to begin with).
+    UIWindow *window = backgroundView.window;
+
     void (^afterCompletionBlock)() = ^() {
-        
+
 #ifdef WY_BASE_SDK_7_ENABLED
-        if ([inView.window respondsToSelector:@selector(setTintAdjustmentMode:)]) {
-            for (UIView *subview in inView.window.subviews) {
+        if ([window respondsToSelector:@selector(setTintAdjustmentMode:)]) {
+            for (UIView *subview in window.subviews) {
                 if (subview != backgroundView) {
                     [subview setTintAdjustmentMode:UIViewTintAdjustmentModeAutomatic];
                 }
             }
         }
 #endif
-        
+
         __typeof__(self) strongSelf = weakSelf;
         
         if (strongSelf)
