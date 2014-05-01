@@ -481,7 +481,7 @@ static char const * const UINavigationControllerEmbedInPopoverTagKey = "UINaviga
     
     WYPopoverTheme *result = [[WYPopoverTheme alloc] init];
     
-    result.tintColor = [UIColor colorWithRed:244./255. green:244./255. blue:244./255. alpha:1.0];
+    result.tintColor = [UIColor whiteColor];
     result.outerStrokeColor = [UIColor clearColor];
     result.innerStrokeColor = [UIColor clearColor];
     result.fillTopColor = nil;
@@ -490,12 +490,12 @@ static char const * const UINavigationControllerEmbedInPopoverTagKey = "UINaviga
     result.glossShadowOffset = CGSizeZero;
     result.glossShadowBlurRadius = 0;
     result.borderWidth = 0;
-    result.arrowBase = 25;
+    result.arrowBase = 30;
     result.arrowHeight = 13;
     result.outerShadowColor = [UIColor clearColor];
     result.outerShadowBlurRadius = 0;
     result.outerShadowOffset = CGSizeZero;
-    result.outerCornerRadius = 5;
+    result.outerCornerRadius = 12;
     result.minOuterCornerRadius = 0;
     result.innerShadowColor = [UIColor clearColor];
     result.innerShadowBlurRadius = 0;
@@ -1215,9 +1215,7 @@ static float edgeSizeFromCornerRadius(float cornerRadius) {
         
         // Inner Path
         CGMutablePathRef outerPathRef = CGPathCreateMutable();
-        
-        CGPoint origin = CGPointZero;
-        
+
         float reducedOuterCornerRadius = 0;
         
         if (arrowDirection == WYPopoverArrowDirectionUp || arrowDirection == WYPopoverArrowDirectionDown)
@@ -1244,93 +1242,57 @@ static float edgeSizeFromCornerRadius(float cornerRadius) {
         }
         
         reducedOuterCornerRadius = MIN(reducedOuterCornerRadius, outerCornerRadius);
-        
-        if (arrowDirection == WYPopoverArrowDirectionUp)
-        {
-            origin = CGPointMake(CGRectGetMidX(outerRect) + arrowOffset - arrowBase / 2, CGRectGetMinY(outerRect));
-            
-            CGPathMoveToPoint(outerPathRef, NULL, origin.x, origin.y);
-            
-            CGPathAddLineToPoint(outerPathRef, NULL, CGRectGetMidX(outerRect) + arrowOffset, CGRectGetMinY(outerRect) - arrowHeight);
-            CGPathAddLineToPoint(outerPathRef, NULL, CGRectGetMidX(outerRect) + arrowOffset + arrowBase / 2, CGRectGetMinY(outerRect));
-            
-            CGPathAddArcToPoint(outerPathRef, NULL, CGRectGetMaxX(outerRect), CGRectGetMinY(outerRect), CGRectGetMaxX(outerRect), CGRectGetMaxY(outerRect), (arrowOffset >= 0) ? reducedOuterCornerRadius : outerCornerRadius);
-            CGPathAddArcToPoint(outerPathRef, NULL, CGRectGetMaxX(outerRect), CGRectGetMaxY(outerRect), CGRectGetMinX(outerRect), CGRectGetMaxY(outerRect), outerCornerRadius);
-            CGPathAddArcToPoint(outerPathRef, NULL, CGRectGetMinX(outerRect), CGRectGetMaxY(outerRect), CGRectGetMinX(outerRect), CGRectGetMinY(outerRect), outerCornerRadius);
-            CGPathAddArcToPoint(outerPathRef, NULL, CGRectGetMinX(outerRect), CGRectGetMinY(outerRect), CGRectGetMaxX(outerRect), CGRectGetMinY(outerRect), (arrowOffset < 0) ? reducedOuterCornerRadius : outerCornerRadius);
-            
-            CGPathAddLineToPoint(outerPathRef, NULL, origin.x, origin.y);
-        }
-        
-        if (arrowDirection == WYPopoverArrowDirectionDown)
-        {
-            origin = CGPointMake(CGRectGetMidX(outerRect) + arrowOffset + arrowBase / 2, CGRectGetMaxY(outerRect));
-            
-            CGPathMoveToPoint(outerPathRef, NULL, origin.x, origin.y);
-            
-            CGPathAddLineToPoint(outerPathRef, NULL, CGRectGetMidX(outerRect) + arrowOffset, CGRectGetMaxY(outerRect) + arrowHeight);
-            CGPathAddLineToPoint(outerPathRef, NULL, CGRectGetMidX(outerRect) + arrowOffset - arrowBase / 2, CGRectGetMaxY(outerRect));
-            
-            CGPathAddArcToPoint(outerPathRef, NULL, CGRectGetMinX(outerRect), CGRectGetMaxY(outerRect), CGRectGetMinX(outerRect), CGRectGetMinY(outerRect), (arrowOffset < 0) ? reducedOuterCornerRadius : outerCornerRadius);
-            CGPathAddArcToPoint(outerPathRef, NULL, CGRectGetMinX(outerRect), CGRectGetMinY(outerRect), CGRectGetMaxX(outerRect), CGRectGetMinY(outerRect), outerCornerRadius);
-            CGPathAddArcToPoint(outerPathRef, NULL, CGRectGetMaxX(outerRect), CGRectGetMinY(outerRect), CGRectGetMaxX(outerRect), CGRectGetMaxY(outerRect), outerCornerRadius);
-            CGPathAddArcToPoint(outerPathRef, NULL, CGRectGetMaxX(outerRect), CGRectGetMaxY(outerRect), CGRectGetMinX(outerRect), CGRectGetMaxY(outerRect), (arrowOffset >= 0) ? reducedOuterCornerRadius : outerCornerRadius);
-            
-            CGPathAddLineToPoint(outerPathRef, NULL, origin.x, origin.y);
-        }
-        
-        if (arrowDirection == WYPopoverArrowDirectionLeft)
-        {
-            origin = CGPointMake(CGRectGetMinX(outerRect), CGRectGetMidY(outerRect) + arrowOffset + arrowBase / 2);
-            
-            CGPathMoveToPoint(outerPathRef, NULL, origin.x, origin.y);
-            
-            CGPathAddLineToPoint(outerPathRef, NULL, CGRectGetMinX(outerRect) - arrowHeight, CGRectGetMidY(outerRect) + arrowOffset);
-            CGPathAddLineToPoint(outerPathRef, NULL, CGRectGetMinX(outerRect), CGRectGetMidY(outerRect) + arrowOffset - arrowBase / 2);
-            
-            CGPathAddArcToPoint(outerPathRef, NULL, CGRectGetMinX(outerRect), CGRectGetMinY(outerRect), CGRectGetMaxX(outerRect), CGRectGetMinY(outerRect), (arrowOffset < 0) ? reducedOuterCornerRadius : outerCornerRadius);
-            CGPathAddArcToPoint(outerPathRef, NULL, CGRectGetMaxX(outerRect), CGRectGetMinY(outerRect), CGRectGetMaxX(outerRect), CGRectGetMaxY(outerRect), outerCornerRadius);
-            CGPathAddArcToPoint(outerPathRef, NULL, CGRectGetMaxX(outerRect), CGRectGetMaxY(outerRect), CGRectGetMinX(outerRect), CGRectGetMaxY(outerRect), outerCornerRadius);
-            CGPathAddArcToPoint(outerPathRef, NULL, CGRectGetMinX(outerRect), CGRectGetMaxY(outerRect), CGRectGetMinX(outerRect), CGRectGetMinY(outerRect), (arrowOffset >= 0) ? reducedOuterCornerRadius : outerCornerRadius);
-            
-            CGPathAddLineToPoint(outerPathRef, NULL, origin.x, origin.y);
-        }
-        
-        if (arrowDirection == WYPopoverArrowDirectionRight)
-        {
-            origin = CGPointMake(CGRectGetMaxX(outerRect), CGRectGetMidY(outerRect) + arrowOffset - arrowBase / 2);
-            
-            CGPathMoveToPoint(outerPathRef, NULL, origin.x, origin.y);
-            
-            CGPathAddLineToPoint(outerPathRef, NULL, CGRectGetMaxX(outerRect) + arrowHeight, CGRectGetMidY(outerRect) + arrowOffset);
-            CGPathAddLineToPoint(outerPathRef, NULL, CGRectGetMaxX(outerRect), CGRectGetMidY(outerRect) + arrowOffset + arrowBase / 2);
-            
-            CGPathAddArcToPoint(outerPathRef, NULL, CGRectGetMaxX(outerRect), CGRectGetMaxY(outerRect), CGRectGetMinX(outerRect), CGRectGetMaxY(outerRect), (arrowOffset >= 0) ? reducedOuterCornerRadius : outerCornerRadius);
-            CGPathAddArcToPoint(outerPathRef, NULL, CGRectGetMinX(outerRect), CGRectGetMaxY(outerRect), CGRectGetMinX(outerRect), CGRectGetMinY(outerRect), outerCornerRadius);
-            CGPathAddArcToPoint(outerPathRef, NULL, CGRectGetMinX(outerRect), CGRectGetMinY(outerRect), CGRectGetMaxX(outerRect), CGRectGetMinY(outerRect), outerCornerRadius);
-            CGPathAddArcToPoint(outerPathRef, NULL, CGRectGetMaxX(outerRect), CGRectGetMinY(outerRect), CGRectGetMaxX(outerRect), CGRectGetMaxY(outerRect), (arrowOffset < 0) ? reducedOuterCornerRadius : outerCornerRadius);
-            
-            CGPathAddLineToPoint(outerPathRef, NULL, origin.x, origin.y);
-        }
-        
-        if (arrowDirection == WYPopoverArrowDirectionNone)
-        {
-            origin = CGPointMake(CGRectGetMaxX(outerRect), CGRectGetMidY(outerRect));
-            
-            CGPathMoveToPoint(outerPathRef, NULL, origin.x, origin.y);
-            
-            CGPathAddLineToPoint(outerPathRef, NULL, CGRectGetMaxX(outerRect), CGRectGetMidY(outerRect));
-            CGPathAddLineToPoint(outerPathRef, NULL, CGRectGetMaxX(outerRect), CGRectGetMidY(outerRect));
-            
-            CGPathAddArcToPoint(outerPathRef, NULL, CGRectGetMaxX(outerRect), CGRectGetMaxY(outerRect), CGRectGetMinX(outerRect), CGRectGetMaxY(outerRect), outerCornerRadius);
-            CGPathAddArcToPoint(outerPathRef, NULL, CGRectGetMinX(outerRect), CGRectGetMaxY(outerRect), CGRectGetMinX(outerRect), CGRectGetMinY(outerRect), outerCornerRadius);
-            CGPathAddArcToPoint(outerPathRef, NULL, CGRectGetMinX(outerRect), CGRectGetMinY(outerRect), CGRectGetMaxX(outerRect), CGRectGetMinY(outerRect), outerCornerRadius);
-            CGPathAddArcToPoint(outerPathRef, NULL, CGRectGetMaxX(outerRect), CGRectGetMinY(outerRect), CGRectGetMaxX(outerRect), CGRectGetMaxY(outerRect), outerCornerRadius);
-            
-            CGPathAddLineToPoint(outerPathRef, NULL, origin.x, origin.y);
-        }
-        
+
+        BOOL up = arrowDirection == WYPopoverArrowDirectionUp;
+        BOOL right = arrowDirection == WYPopoverArrowDirectionRight;
+        BOOL down = arrowDirection == WYPopoverArrowDirectionDown;
+        BOOL left = arrowDirection == WYPopoverArrowDirectionLeft;
+        CGFloat minX = CGRectGetMinX(outerRect);
+        CGFloat maxX = CGRectGetMaxX(outerRect);
+        CGFloat minY = CGRectGetMinY(outerRect);
+        CGFloat maxY = CGRectGetMaxY(outerRect);
+        CGFloat midX = CGRectGetMidX(outerRect);
+        CGFloat midY = CGRectGetMidY(outerRect);
+
+        CGPathMoveToPoint(outerPathRef, NULL, midX, minY);
+        CGPathAddArcToPoint(outerPathRef, NULL, maxX, minY, maxX, maxY, (arrowOffset >= 0 && up) || (arrowOffset < 0 && right) ? reducedOuterCornerRadius : outerCornerRadius); // Upper right corner
+        CGPathAddArcToPoint(outerPathRef, NULL, maxX, maxY, minX, maxY, (arrowOffset >= 0 && right) || (arrowOffset >= 0 && down) ? reducedOuterCornerRadius : outerCornerRadius); // Lower right corner
+        CGPathAddArcToPoint(outerPathRef, NULL, minX, maxY, minX, minY, (arrowOffset >= 0 && left) || (arrowOffset < 0 && down) ? reducedOuterCornerRadius : outerCornerRadius); // Lower left corner
+        CGPathAddArcToPoint(outerPathRef, NULL, minX, minY, maxX, minY, (arrowOffset < 0 && up) || (arrowOffset < 0 && left) ? reducedOuterCornerRadius : outerCornerRadius); // Upper left corner
         CGPathCloseSubpath(outerPathRef);
+
+        CGFloat cpLowerOffset = 7;
+        CGFloat cpUpperOffset = 5;
+        CGPoint arrowOrigin = CGPointMake(-(arrowBase + 0.0 * 2) / 2, arrowHeight);
+        CGPoint arrowEnd = CGPointMake((arrowBase) / 2, arrowHeight);
+        CGPoint arrowPoint = CGPointZero;
+        CGAffineTransform transform;
+
+        UIBezierPath *arrowPath = [[UIBezierPath alloc] init];
+        [arrowPath moveToPoint:arrowOrigin];
+        [arrowPath addCurveToPoint:arrowPoint controlPoint1:CGPointMake(arrowOrigin.x + cpLowerOffset, arrowOrigin.y) controlPoint2:CGPointMake(arrowPoint.x - cpUpperOffset, arrowPoint.y)];
+        [arrowPath addCurveToPoint:arrowEnd controlPoint1:CGPointMake(arrowPoint.x + cpUpperOffset, arrowPoint.y) controlPoint2:CGPointMake(arrowEnd.x - cpLowerOffset, arrowEnd.y)];
+        [arrowPath closePath];
+
+        switch (arrowDirection) {
+            case WYPopoverArrowDirectionUp:
+                transform = CGAffineTransformMakeTranslation(midX + arrowOffset, minY - arrowHeight);
+                break;
+            case WYPopoverArrowDirectionDown:
+                transform = CGAffineTransformRotate(CGAffineTransformMakeTranslation(midX + arrowOffset, maxY + arrowHeight), M_PI);
+                break;
+            case WYPopoverArrowDirectionLeft:
+                transform = CGAffineTransformRotate(CGAffineTransformMakeTranslation(minX - arrowHeight, midY + arrowOffset), 3 * M_PI / 2);
+                break;
+            case WYPopoverArrowDirectionRight:
+                transform = CGAffineTransformRotate(CGAffineTransformMakeTranslation(maxX + arrowHeight, midY + arrowOffset), M_PI / 2);
+                break;
+            default:
+                NSAssert(NO, @"Invalid arrow direction detected!");
+                break;
+        }
+
+        CGPathAddPath(outerPathRef, &transform, arrowPath.CGPath);
         
         UIBezierPath* outerRectPath = [UIBezierPath bezierPathWithCGPath:outerPathRef];
         
@@ -1981,8 +1943,13 @@ static WYPopoverTheme *defaultTheme_ = nil;
 #endif
     
     backgroundView.hidden = NO;
-    
+
+#ifdef WY_BASE_SDK_7_ENABLED
+    // iOS 7 popovers appear instantly and fade out when dismissing.
+    if (NO)
+#else
     if (animated)
+#endif
     {
         if ((options & WYPopoverAnimationOptionFade) == WYPopoverAnimationOptionFade)
         {
@@ -2951,28 +2918,29 @@ static WYPopoverTheme *defaultTheme_ = nil;
 
 #pragma mark Inline functions
 
-static NSString* WYStringFromOrientation(NSInteger orientation) {
-    NSString *result = @"Unknown";
-    
-    switch (orientation) {
-        case UIInterfaceOrientationPortrait:
-            result = @"Portrait";
-            break;
-        case UIInterfaceOrientationPortraitUpsideDown:
-            result = @"Portrait UpsideDown";
-            break;
-        case UIInterfaceOrientationLandscapeLeft:
-            result = @"Landscape Left";
-            break;
-        case UIInterfaceOrientationLandscapeRight:
-            result = @"Landscape Right";
-            break;
-        default:
-            break;
-    }
-    
-    return result;
-}
+// Only used in commented out logging functionality.
+//static NSString* WYStringFromOrientation(NSInteger orientation) {
+//    NSString *result = @"Unknown";
+//    
+//    switch (orientation) {
+//        case UIInterfaceOrientationPortrait:
+//            result = @"Portrait";
+//            break;
+//        case UIInterfaceOrientationPortraitUpsideDown:
+//            result = @"Portrait UpsideDown";
+//            break;
+//        case UIInterfaceOrientationLandscapeLeft:
+//            result = @"Landscape Left";
+//            break;
+//        case UIInterfaceOrientationLandscapeRight:
+//            result = @"Landscape Right";
+//            break;
+//        default:
+//            break;
+//    }
+//    
+//    return result;
+//}
 
 static float WYStatusBarHeight() {
     UIInterfaceOrientation orienation = [[UIApplication sharedApplication] statusBarOrientation];
