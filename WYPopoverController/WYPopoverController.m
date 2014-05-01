@@ -2547,17 +2547,6 @@ static WYPopoverTheme *defaultTheme_ = nil;
     UIWindow *window = backgroundView.window;
 
     void (^afterCompletionBlock)() = ^() {
-
-#ifdef WY_BASE_SDK_7_ENABLED
-        if ([window respondsToSelector:@selector(setTintAdjustmentMode:)]) {
-            for (UIView *subview in window.subviews) {
-                if (subview != backgroundView) {
-                    [subview setTintAdjustmentMode:UIViewTintAdjustmentModeAutomatic];
-                }
-            }
-        }
-#endif
-
         __typeof__(self) strongSelf = weakSelf;
         
         if (strongSelf)
@@ -2587,7 +2576,15 @@ static WYPopoverTheme *defaultTheme_ = nil;
     };
     
     void (^completionBlock)() = ^() {
-        
+#ifdef WY_BASE_SDK_7_ENABLED
+        if ([window respondsToSelector:@selector(setTintAdjustmentMode:)]) {
+            for (UIView *subview in window.subviews) {
+                if (subview != backgroundView) {
+                    [subview setTintAdjustmentMode:UIViewTintAdjustmentModeAutomatic];
+                }
+            }
+        }
+#endif
         __typeof__(self) strongSelf = weakSelf;
         [strongSelf->backgroundView removeFromSuperview];
         
