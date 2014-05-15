@@ -1789,7 +1789,6 @@ static WYPopoverTheme *defaultTheme_ = nil;
         CGSize windowSize = [[UIApplication sharedApplication] keyWindow].bounds.size;
         
         UIInterfaceOrientation orientation = [[UIApplication sharedApplication] statusBarOrientation];
-        result = self.popoverContentSize;
         result = CGSizeMake(320, UIDeviceOrientationIsLandscape(orientation) ? windowSize.width : windowSize.height);
         result.width = MIN(result.width, self.popoverContentSize.width);
         result.height = MIN(result.height, self.popoverContentSize.height);
