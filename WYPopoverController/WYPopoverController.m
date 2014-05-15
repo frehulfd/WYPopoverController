@@ -1763,19 +1763,18 @@ static WYPopoverTheme *defaultTheme_ = nil;
     
     UIViewController *topViewController = viewController;
     
-// The UINavigationController does the right thing, at least in iOS 7. -Don
-//    if ([viewController isKindOfClass:[UINavigationController class]] == YES)
-//    {
-//        UINavigationController *navigationController = (UINavigationController *)viewController;
-//        topViewController = [navigationController topViewController];
-//    }
-    
 #ifdef WY_BASE_SDK_7_ENABLED
     if ([topViewController respondsToSelector:@selector(preferredContentSize)])
     {
         result = topViewController.preferredContentSize;
     }
 #endif
+
+    if ([viewController isKindOfClass:[UINavigationController class]] == YES)
+    {
+        UINavigationController *navigationController = (UINavigationController *)viewController;
+        topViewController = [navigationController topViewController];
+    }
     
     if (CGSizeEqualToSize(result, CGSizeZero))
     {
@@ -1790,8 +1789,9 @@ static WYPopoverTheme *defaultTheme_ = nil;
         CGSize windowSize = [[UIApplication sharedApplication] keyWindow].bounds.size;
         
         UIInterfaceOrientation orientation = [[UIApplication sharedApplication] statusBarOrientation];
-        
         result = CGSizeMake(320, UIDeviceOrientationIsLandscape(orientation) ? windowSize.width : windowSize.height);
+        result.width = MIN(result.width, self.popoverContentSize.width);
+        result.height = MIN(result.height, self.popoverContentSize.height);
     }
     
     return result;
