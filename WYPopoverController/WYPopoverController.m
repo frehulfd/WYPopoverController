@@ -1261,8 +1261,14 @@ static float edgeSizeFromCornerRadius(float cornerRadius) {
         CGPathAddArcToPoint(outerPathRef, NULL, minX, minY, maxX, minY, (arrowOffset < 0 && up) || (arrowOffset < 0 && left) ? reducedOuterCornerRadius : outerCornerRadius); // Upper left corner
         CGPathCloseSubpath(outerPathRef);
 
+#ifdef WY_BASE_SDK_7_ENABLED
+        // These control point offsets allow us to use cubic bezier curves in order to approximate the iOS 7 style curved popover arrows.
         CGFloat cpLowerOffset = 7;
         CGFloat cpUpperOffset = 5;
+#else
+        CGFloat cpLowerOffset = 0;
+        CGFloat cpUpperOffset = 0;
+#endif
         CGPoint arrowOrigin = CGPointMake(-(arrowBase + 0.0 * 2) / 2, arrowHeight);
         CGPoint arrowEnd = CGPointMake((arrowBase) / 2, arrowHeight);
         CGPoint arrowPoint = CGPointZero;
@@ -3106,7 +3112,8 @@ static CGPoint WYPointRelativeToOrientation(CGPoint origin, CGSize size, UIInter
     }
     
     if (shouldIgnore == NO) {
-        // We don't want this animation because it doesn't work quite right when the popover is shrinking vertically. -Don
+        // We don't want this animation because it doesn't work quite right when the popover is shrinking vertically, because
+        // the popover shape gets resized as a whole.
         [self positionPopover:NO];
     }
 }
@@ -3122,7 +3129,8 @@ static CGPoint WYPointRelativeToOrientation(CGPoint origin, CGSize size, UIInter
     }
     
     if (shouldIgnore == NO) {
-        // We don't want this animation because it doesn't work quite right when the popover is shrinking vertically. -Don
+        // We don't want this animation because it doesn't work quite right when the popover is shrinking vertically, because
+        // the popover shape gets resized as a whole.
         [self positionPopover:NO];
     }
 }
