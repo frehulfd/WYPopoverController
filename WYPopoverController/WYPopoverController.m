@@ -1789,6 +1789,12 @@ static WYPopoverTheme *defaultTheme_ = nil;
         result = topViewController.contentSizeForViewInPopover;
 #pragma clang diagnostic pop
     }
+
+    // Add a fallback to any manually set size on the overall popover
+    if (CGSizeEqualToSize(result, CGSizeZero))
+    {
+        result = popoverContentSize_;
+    }
     
     if (CGSizeEqualToSize(result, CGSizeZero))
     {
@@ -1796,8 +1802,6 @@ static WYPopoverTheme *defaultTheme_ = nil;
         
         UIInterfaceOrientation orientation = [[UIApplication sharedApplication] statusBarOrientation];
         result = CGSizeMake(320, UIDeviceOrientationIsLandscape(orientation) ? windowSize.width : windowSize.height);
-        result.width = MIN(result.width, self.popoverContentSize.width);
-        result.height = MIN(result.height, self.popoverContentSize.height);
     }
     
     return result;
@@ -1876,6 +1880,15 @@ static WYPopoverTheme *defaultTheme_ = nil;
     animated = aAnimated;
     options = aOptions;
     
+    if (!inView)
+    {
+        inView = [UIApplication sharedApplication].keyWindow.rootViewController.view;
+        if (CGRectIsEmpty(rect))
+        {
+            rect = CGRectMake((int)inView.bounds.size.width / 2 - 5, (int)inView.bounds.size.height / 2 - 5, 10, 10);
+        }
+    }
+    
     CGSize contentViewSize = self.popoverContentSize;
     
     if (overlayView == nil)
@@ -1938,15 +1951,17 @@ static WYPopoverTheme *defaultTheme_ = nil;
         
     };
     
+    void (^adjustTintDimmed)() = ^() {
 #ifdef WY_BASE_SDK_7_ENABLED
-    if ([inView.window respondsToSelector:@selector(setTintAdjustmentMode:)]) {
-        for (UIView *subview in inView.window.subviews) {
-            if (subview != backgroundView) {
-                [subview setTintAdjustmentMode:UIViewTintAdjustmentModeDimmed];
+        if ([inView.window respondsToSelector:@selector(setTintAdjustmentMode:)]) {
+            for (UIView *subview in inView.window.subviews) {
+                if (subview != backgroundView) {
+                    [subview setTintAdjustmentMode:UIViewTintAdjustmentModeDimmed];
+                }
             }
         }
-    }
 #endif
+    };
     
     backgroundView.hidden = NO;
 
@@ -1982,12 +1997,14 @@ static WYPopoverTheme *defaultTheme_ = nil;
                 strongSelf->backgroundView.alpha = 1;
                 strongSelf->backgroundView.transform = endTransform;
             }
+            adjustTintDimmed();
         } completion:^(BOOL finished) {
             completionBlock(YES);
         }];
     }
     else
     {
+        adjustTintDimmed();
         [viewController viewWillAppear:NO];
         completionBlock(NO);
     }
@@ -2552,36 +2569,8 @@ static WYPopoverTheme *defaultTheme_ = nil;
     // backgroundView's window (which was the same to begin with).
     UIWindow *window = backgroundView.window;
 
-    void (^afterCompletionBlock)() = ^() {
-        __typeof__(self) strongSelf = weakSelf;
-        
-        if (strongSelf)
-        {
-            strongSelf->backgroundView = nil;
-            
-            [strongSelf->overlayView removeFromSuperview];
-            strongSelf->overlayView = nil;
-            
-            if ([strongSelf->viewController isKindOfClass:[UINavigationController class]] == NO)
-            {
-                [strongSelf->viewController viewDidDisappear:aAnimated];
-            }
-            
-            if (completion)
-            {
-                completion();
-            }
-            else if (callDelegate)
-            {
-                if (strongSelf->delegate && [strongSelf->delegate respondsToSelector:@selector(popoverControllerDidDismissPopover:)])
-                {
-                    [strongSelf->delegate popoverControllerDidDismissPopover:strongSelf];
-                }
-            }
-        }
-    };
     
-    void (^completionBlock)() = ^() {
+    void (^adjustTintAutomatic)() = ^() {
 #ifdef WY_BASE_SDK_7_ENABLED
         if ([window respondsToSelector:@selector(setTintAdjustmentMode:)]) {
             for (UIView *subview in window.subviews) {
@@ -2591,25 +2580,32 @@ static WYPopoverTheme *defaultTheme_ = nil;
             }
         }
 #endif
-        __typeof__(self) strongSelf = weakSelf;
-        [strongSelf->backgroundView removeFromSuperview];
+    };
+    
+    void (^completionBlock)() = ^() {
         
-        if (aAnimated)
-        {
-            [UIView animateWithDuration:duration animations:^{
-                __typeof__(self) strongSelf = weakSelf;
-                
-                if (strongSelf)
-                {
-                    strongSelf->overlayView.alpha = 0;
-                }
-            } completion:^(BOOL finished) {
-                afterCompletionBlock();
-            }];
+        __typeof__(self) strongSelf = weakSelf;
+        
+        if (strongSelf) {
+            [strongSelf->backgroundView removeFromSuperview];
+            
+            strongSelf->backgroundView = nil;
+            
+            [strongSelf->overlayView removeFromSuperview];
+            strongSelf->overlayView = nil;
+            
+            if ([strongSelf->viewController isKindOfClass:[UINavigationController class]] == NO)
+            {
+                [strongSelf->viewController viewDidDisappear:aAnimated];
+            }
         }
-        else
+        if (completion)
         {
-            afterCompletionBlock();
+            completion();
+        }
+        else if (callDelegate && strongSelf && strongSelf->delegate && [strongSelf->delegate respondsToSelector:@selector(popoverControllerDidDismissPopover:)])
+        {
+            [strongSelf->delegate popoverControllerDidDismissPopover:strongSelf];
         }
     };
     
@@ -2666,13 +2662,16 @@ static WYPopoverTheme *defaultTheme_ = nil;
                     CGAffineTransform endTransform = [self transformForArrowDirection:strongSelf->backgroundView.arrowDirection];
                     strongSelf->backgroundView.transform = endTransform;
                 }
+                strongSelf->overlayView.alpha = 0;
             }
+            adjustTintAutomatic();
         } completion:^(BOOL finished) {
             completionBlock();
         }];
     }
     else
     {
+        adjustTintAutomatic();
         completionBlock();
     }
 }
